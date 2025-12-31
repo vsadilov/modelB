@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="700" viewBox="0 0 1100 700">
+  <style>
+    .box { fill: #f7f7f7; stroke: #333; stroke-width: 1.5; }
+    .title { font: 600 16px 'Helvetica', 'Arial', sans-serif; fill: #111; }
+    .text { font: 13px 'Helvetica', 'Arial', sans-serif; fill: #222; }
+    .line { stroke: #444; stroke-width: 1.4; fill: none; }
+  </style>
+
+  <!-- GPTLanguageModel -->
+  <rect class="box" x="60" y="40" width="320" height="180" rx="6"/>
+  <text class="title" x="80" y="70">GPTLanguageModel</text>
+  <text class="text" x="80" y="100">+ token_embedding_table</text>
+  <text class="text" x="80" y="120">+ position_embedding_table</text>
+  <text class="text" x="80" y="140">+ blocks</text>
+  <text class="text" x="80" y="160">+ ln_f</text>
+  <text class="text" x="80" y="180">+ lm_head</text>
+
+  <!-- TransformerBlock -->
+  <rect class="box" x="60" y="280" width="320" height="150" rx="6"/>
+  <text class="title" x="80" y="310">TransformerBlock</text>
+  <text class="text" x="80" y="340">+ ln1</text>
+  <text class="text" x="80" y="360">+ ln2</text>
+  <text class="text" x="80" y="380">+ self_attn</text>
+  <text class="text" x="80" y="400">+ ffwd</text>
+
+  <!-- MultiHeadSelfAttention -->
+  <rect class="box" x="460" y="280" width="320" height="150" rx="6"/>
+  <text class="title" x="480" y="310">MultiHeadSelfAttention</text>
+  <text class="text" x="480" y="340">+ heads</text>
+  <text class="text" x="480" y="360">+ proj</text>
+  <text class="text" x="480" y="380">+ dropout</text>
+
+  <!-- FeedForward -->
+  <rect class="box" x="460" y="470" width="320" height="120" rx="6"/>
+  <text class="title" x="480" y="500">FeedForward</text>
+  <text class="text" x="480" y="530">+ net</text>
+
+  <!-- SelfAttentionHead -->
+  <rect class="box" x="840" y="280" width="220" height="170" rx="6"/>
+  <text class="title" x="860" y="310">SelfAttentionHead</text>
+  <text class="text" x="860" y="340">+ key</text>
+  <text class="text" x="860" y="360">+ query</text>
+  <text class="text" x="860" y="380">+ value</text>
+  <text class="text" x="860" y="400">+ tril</text>
+  <text class="text" x="860" y="420">+ dropout</text>
+
+  <!-- Lines: GPT -> Block -->
+  <path class="line" d="M220 220 L220 280"/>
+  <circle cx="220" cy="280" r="4" fill="#444"/>
+
+  <!-- Lines: Block -> MHA -->
+  <path class="line" d="M380 350 L460 350"/>
+  <circle cx="460" cy="350" r="4" fill="#444"/>
+
+  <!-- Lines: Block -> FFN -->
+  <path class="line" d="M380 400 L460 530"/>
+  <circle cx="460" cy="530" r="4" fill="#444"/>
+
+  <!-- Lines: MHA -> Head -->
+  <path class="line" d="M780 350 L840 350"/>
+  <circle cx="840" cy="350" r="4" fill="#444"/>
+
+  <!-- Labels -->
+  <text class="text" x="230" y="255">contains *</text>
+  <text class="text" x="395" y="342">uses</text>
+  <text class="text" x="395" y="448">uses</text>
+  <text class="text" x="795" y="342">contains *</text>
+</svg>

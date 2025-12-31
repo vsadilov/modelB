@@ -1,0 +1,14 @@
+/out
+/locals
+*.pth
+*.pyc
+*.log
+models/**/*.pth
+__pycache__/
+.DS_Store
+dataset/.DS_Store
+models/.DS_Store
+notebooks/input.txt
+notebooks/shakespeare.model
+notebooks/shakespeare.vocab
+models/*.vocab_chars.*
