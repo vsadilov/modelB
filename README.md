@@ -12,7 +12,6 @@ ModelB is an excellent resource for understanding key transformer concepts:
 - **Positional Embeddings**: Learn how position information is encoded and added to token embeddings
 - **Layer Normalization**: Understand the role of normalization in transformer stability (Pre-LN architecture)
 - **Feed-Forward Networks**: Explore position-wise feed-forward layers with ReLU activation and dimensionality expansion
-- **Residual Connections**: See how skip connections improve gradient flow through deep networks
 
 ### Training & Optimization
 - **Gradient Descent with AdamW**: Understand modern optimization for transformer training
@@ -37,26 +36,15 @@ Easily adjust these parameters to experiment with model capacity and behavior:
 - **dropout** - Regularization technique to prevent overfitting
 - **learning_rate** - Controls the speed of parameter updates
 
-### Text Generation
-- Learn autoregressive generation: predicting one token at a time
-- Understand sampling with temperature: balancing diversity vs. determinism
-- See how the model generates coherent text sequences using its learned patterns
-
-### Dataset Handling
-- Work with raw text files at different scales (tiny to large)
-- Implement train/validation splits for proper evaluation
-- Process Shakespeare texts to see transformers work on classical literature
 
 ## Key Features
 
 ModelB supports:
 - **Multiple Dataset Configurations**: Train on tiny or full Shakespeare datasets with automatic train/val splitting
 - **Flexible Tokenization**: Choose between character-level and SentencePiece (BPE) tokenization
-- **Configurable Model Variants**: Define experiments in Python config files (v1-v5 provided) for easy reproducibility
+- **Configurable Model Variants**: Define experiments in Python config files for easy reproducibility
 - **Multi-GPU Training**: Support for data parallelization across multiple GPUs
 - **Cross-Platform Hardware**: Optimized for CUDA (NVIDIA GPUs), MPS (Apple Silicon), and CPU
-- **Checkpoint System**: Save/resume training with full optimizer state preservation
-- **Tokenizer Persistence**: Vocabulary versions are tracked with model checkpoints
 
 ## Project Structure for Learning
 
@@ -77,7 +65,7 @@ Special thanks to [Andrej Karpathy](https://github.com/karpathy) who inspired th
 
 Dependencies:
 - Python 3.9+
-- PyTorch (with GPU support recommended)
+- PyTorch (with GPU support)
 - NumPy
 - SentencePiece (only required for `tokenizer_type = "sentencepiece"`)
 
@@ -88,9 +76,9 @@ pip install torch numpy sentencepiece
 
 Note: Training is significantly faster on GPUs. CPU training will be very slow but works for tiny models.
 
-### Train and Sample
+### Training and Sampling
 
-Create or activate your environment, then run training with a config:
+Training could be started running a command as following:
 
 ```bash
 python train.py --config config/v4.py
@@ -116,12 +104,6 @@ python sample.py --config config/v4.py
 3. Samples tokens based on the model's probability distribution
 4. Outputs the generated text
 
-List available configs:
-
-```bash
-python train.py --list-experiments
-python sample.py --list-experiments
-```
 
 ### Understanding the Configurations
 
@@ -136,8 +118,6 @@ The project includes 5 example configurations demonstrating different model size
 | v5 | SentencePiece (BPE) | Large | train/val split | Modern tokenization approach |
 
 Each config file in `config/` is self-contained and shows how to set all parameters for reproducibility.
-
-### Hardware Notes
 
 ### Hardware Notes
 
@@ -174,43 +154,7 @@ ModelB includes tools to work with Shakespeare texts at different scales. Two pr
 | Tiny Shakespeare | 1.1M chars | A subset for quick experiments |
 | Full Shakespeare Collection | 5.3M chars | Complete works of Shakespeare |
 
-#### Working with Raw Data
-
-Raw Shakespeare texts are stored in `data/raw/full_list/`. You can process them as follows:
-
-**Clean raw data** (remove headers and formatting):
-
-```bash
-python scripts/clean_dataset.py \
-  --input-dir data/raw/full_list \
-  --output-dir data/clean/full_list_clean
-```
-
-This step removes metadata and standardizes the text format.
-
-**Split into train/validation** using ACT/SCENE boundaries for clean splits:
-
-```bash
-python scripts/split_dataset.py \
-  --input-dir data/clean/full_list_clean \
-  --train-out data/train.txt \
-  --val-out data/val.txt \
-  --val-ratio 0.10 \
-  --seed 1337
-```
-
-The `--val-ratio` parameter controls the percentage of data used for validation (typically 10-20%). Larger validation sets give more stable loss estimates but reduce training data.
-
-**Evaluate vocabulary coverage** for different tokenizer approaches:
-
-```bash
-python scripts/eval_vocab.py --config config/v5.py
-```
-
-This tool helps you understand:
-- How well different vocab sizes cover your dataset
-- Trade-offs between vocabulary size and encoding efficiency
-- Whether you need more subword tokens or if character-level is sufficient
+You can also prepare your own datasets by placing text files in the `data/` folder and updating the config paths.
 
 #### Understanding the Data Flow
 
@@ -246,25 +190,6 @@ sp_model_type = "bpe"
 sp_character_coverage = 1.0
 sp_train_if_missing = True
 ```
-## Project layout
-
-- `train.py` - training entry point
-- `sample.py` - text generation entry point
-- `model.py` - transformer model (decoder-only)
-- `tokenizers.py` - char-level and SentencePiece vocab handling
-- `data.py` - dataset loading and split handling
-- `utils.py` - device selection and checkpoint helpers
-- `config/` - experiment configs (`v2.py`, `v3.py`, `v4.py`, `v5.py`)
-- `scripts/` - dataset cleanup/split/eval scripts
-- `data/`
-  - `data/raw/` - raw sources
-  - `data/clean/` - cleaned sources
-  - `data/train.txt`, `data/val.txt` - training splits
-- `models/` - checkpoints and tokenizer models (gitignored)
-- `docs/` - tutorial notes (planned)
-- `notebooks/` - optional exploration within a [Jupyter Notebook](https://jupyter.org/)
-- `old_versions/` - legacy monolithic scripts (reference only)
-
 
 ## Tokenizers and vocab versioning
 
@@ -443,10 +368,6 @@ Return full sequence
 - Too low: training very slow, may get stuck
 - AdamW adapts per-parameter learning rates, making it robust to this choice
 
-## Notes on Loss Scale
-
-If you switch to a larger vocabulary (SentencePiece), expect the loss scale to increase (e.g., baseline around `ln(vocab_size)`). Compare validation loss only within the same tokenizer settings.
-
 ## Model Results & Benchmarks
 
 Track your experiments here. The table shows example results from the provided configurations:
@@ -464,50 +385,6 @@ Track your experiments here. The table shows example results from the provided c
 - Loss increases with larger vocabulary (SentencePiece), so compare within same tokenizer
 - Validation loss higher than training loss is normal (model hasn't seen validation data)
 - Gap between train and val loss indicates overfitting (larger dropout helps)
-
-## Hands-On Experiments
-
-Here are experiments you can run to understand transformers better:
-
-### Experiment 1: Effect of Model Size
-```bash
-# Train progressively larger models
-python train.py --config config/v1.py  # ~2M params
-python train.py --config config/v2.py  # ~5M params
-python train.py --config config/v3.py  # ~6M params
-```
-**Observation**: Larger models reach lower loss but take longer to train
-
-### Experiment 2: Learning Rate Effects
-Modify `learning_rate` in a config file (e.g., try 1e-3, 3e-4, 1e-4) and track loss curves. Plot them to see the "sweet spot" for your hardware.
-
-### Experiment 3: Dropout & Regularization
-Compare training with `dropout = 0.0` vs `dropout = 0.3`. Look at the gap between training and validation loss to observe regularization effects.
-
-### Experiment 4: Tokenizer Comparison
-1. Train v4 with SentencePiece tokenization
-2. Train with custom config using character-level on the same data
-3. Compare: loss values, generation quality, training speed
-
-### Experiment 5: Context Length Effects
-Create a config with `block_size = 64` and compare against `block_size = 256`. Shorter context limits what the model can "see" about previous tokens.
-
-## Common Questions
-
-**Q: Why does my model generate repetitive text?**
-A: The model may need more training (increase `max_iters`), more data, or better regularization (increase `dropout`). Early in training, models often generate simple patterns.
-
-**Q: Can I use my own dataset?**
-A: Yes! Place your text file in the `data/` folder and create a config pointing to it with `dataset_path = "data/mydata.txt"`. For large files, use train/val split with `train_dataset_path` and `val_dataset_path`.
-
-**Q: What's the difference between char and SentencePiece tokenization?**
-A: Character-level is simpler (vocab size ≈ 100) but requires longer sequences. SentencePiece (BPE) uses larger tokens (vocab size ≈ 3000-50000), making sequences shorter and training faster.
-
-**Q: How do I resume training from a checkpoint?**
-A: Just run `python train.py --config config/vX.py` again - if the checkpoint exists, it will automatically load and continue from where it left off.
-
-**Q: Is this a production model?**
-A: No - ModelB is for learning. Production models use more sophisticated techniques: different architectures, advanced optimizers, large-scale training, careful hyperparameter tuning, and external knowledge integration.
 
 ## Suggested Next Steps
 
@@ -537,16 +414,6 @@ A: No - ModelB is for learning. Production models use more sophisticated techniq
 - [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/) - Visual explanation
 - [Transformer Circuits Thread](https://transformer-circuits.pub/) - Deep mechanistic understanding
 
-## Sampling Tips
-
-- Use the same config/checkpoint pair that was used for training to keep vocab compatibility
-- If generation looks repetitive, try: more training data, higher dropout, or longer training
-- Reduce `max_new_tokens` for faster generation while testing
-
 ## Contributing
 
-Have improvements or suggestions? Feel free to:
-- Report issues or bugs
-- Suggest clearer explanations or documentation
-- Add new experiment configurations
-- Optimize training/inference code
+Have improvements or suggestions? Feel free to report issues or bugs, suggest clearer explanations or documentation or share you experiment configurations.
