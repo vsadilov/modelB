@@ -70,6 +70,7 @@ def save_vocab_chars(save_path, vocab_chars):
     if not vocab_chars:
         return
     path = _vocab_chars_path(save_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(vocab_chars, ensure_ascii=True), encoding="utf-8")
 
 
